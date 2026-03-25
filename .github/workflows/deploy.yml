@@ -13,9 +13,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Build Docker
-        run: docker build -t devops-app .
-
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
@@ -23,6 +20,10 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
           script: |
+            cd ~/devops-project/app
+
             docker stop app || true
             docker rm app || true
-            docker run -d -p 3000:3000 devops-app
+
+            docker build -t devops-app .
+            docker run -d -p 3000:3000 --name app devops-app
